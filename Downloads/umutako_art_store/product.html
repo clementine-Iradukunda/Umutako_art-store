@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Details — Umutako Art Store</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="navbar">
+    <div class="nav-inner">
+        <a href="index.html" class="logo">🎨 Umutako <span>Art Store</span></a>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="index.html#home">Home</a></li>
+            <li><a href="index.html#products">Shop</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+            <li>
+                <a href="#" class="nav-cart-btn" onclick="openCart(); return false;">
+                    🛒 Cart
+                    <span class="cart-badge cart-count" style="display:none">0</span>
+                </a>
+            </li>
+        </ul>
+        <button class="hamburger" onclick="toggleNav()" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+    <div class="breadcrumb-inner">
+        <a href="index.html">Home</a> &rsaquo;
+        <a href="index.html#products">Shop</a> &rsaquo;
+        <span id="bc-name">Product</span>
+    </div>
+</div>
+
+<!-- PRODUCT DETAIL -->
+<main class="product-detail-page">
+    <div class="pdp-inner" id="pdp-inner">
+        <div class="loading"><div class="spinner"></div>Loading product…</div>
+    </div>
+</main>
+
+<!-- RELATED PRODUCTS -->
+<section class="related-section" id="related-section" style="display:none">
+    <div class="shop-heading">
+        <h2>More from this Category</h2>
+        <div class="heading-line"></div>
+    </div>
+    <div class="products-section">
+        <div class="products-grid" id="related-grid"></div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>🎨 Umutako Art Store</h3>
+            <p>Handcrafted in Rwanda.<br />Shipped with love to the world.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="index.html#products">Shop</a></li>
+                <li><a href="index.html#about">About Us</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© 2026 Umutako Art Store. All rights reserved.</span>
+        <span>Designed & built with ❤️ in Rwanda</span>
+    </div>
+</footer>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+        <h3>🛒 Your Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cart-items-list"></div>
+    <div class="cart-footer">
+        <div class="cart-total">
+            <span>Total</span>
+            <span id="cart-total-amount">RWF 0</span>
+        </div>
+        <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout →</button>
+    </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkout-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>📦 Checkout</h3>
+            <button class="modal-close" onclick="closeCheckout()">✕</button>
+        </div>
+        <div class="modal-body" id="checkout-body">
+            <div class="order-summary-box">
+                <h4>Order Summary</h4>
+                <div id="order-summary-items"></div>
+                <div class="summary-total">
+                    <span>Total to Pay</span>
+                    <span id="order-summary-total">RWF 0</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="cust-name">Full Name *</label>
+                <input type="text" id="cust-name" placeholder="e.g. Uwase Clémentine" />
+            </div>
+            <div class="form-group">
+                <label for="cust-email">Email Address *</label>
+                <input type="email" id="cust-email" placeholder="e.g. uwase@email.com" />
+            </div>
+            <div class="form-group">
+                <label for="cust-phone">Phone Number</label>
+                <input type="tel" id="cust-phone" placeholder="e.g. +250 788 000 000" />
+            </div>
+            <div class="form-group">
+                <label for="cust-address">Delivery Address *</label>
+                <textarea id="cust-address" placeholder="e.g. KG 11 Ave, Kiyovu, Kigali"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="cust-notes">Notes (optional)</label>
+                <textarea id="cust-notes" placeholder="Any special instructions?"></textarea>
+            </div>
+            <button class="place-order-btn" id="place-order-btn" onclick="placeOrder()">✅ Place Order</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/main.js"></script>
+<script src="js/product.js"></script>
+</body>
+</html>
