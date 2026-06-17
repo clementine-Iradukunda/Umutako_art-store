@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Sensitive / local only
+php/db_connect.local.php
+umutako_export.sql
+umutako_live_export.sql
+umutako_art_store.zip
+
+# XAMPP specific
+{css,js,php,images}/

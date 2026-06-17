@@ -1,0 +1,45 @@
+# ================================================
+#  docker-compose.yml — Umutako Art Store
+#  Runs two services: web (PHP/Apache) + db (MySQL)
+#
+#  HOW TO RUN:
+#    docker-compose up --build
+#  Then open:  http://localhost:8080
+# ================================================
+
+version: '3.8'
+
+services:
+
+  # ── Web server (PHP + Apache) ──────────────────
+  web:
+    build: .
+    ports:
+      - "8080:80"        # Visit http://localhost:8080
+    depends_on:
+      - db
+    environment:
+      # These match php/db_connect.php settings
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS: rootpassword
+      DB_NAME: umutako_art_store
+    volumes:
+      - .:/var/www/html  # Live-reload: changes appear instantly
+    restart: unless-stopped
+
+  # ── MySQL Database ─────────────────────────────
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: umutako_art_store
+    ports:
+      - "3307:3306"      # Connect from host on port 3307
+    volumes:
+      - db_data:/var/lib/mysql          # Persist data between restarts
+      - ./database.sql:/docker-entrypoint-initdb.d/init.sql  # Auto-run on first start
+    restart: unless-stopped
+
+volumes:
+  db_data:
