@@ -1,12 +1,13 @@
 <?php
 // ================================================
 //  db_connect.php — Database Connection
+//  Umutako Art Store — LIVE SERVER
 // ================================================
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'umutako_art_store');
+define('DB_HOST', 'sql212.infinityfree.com');
+define('DB_USER', 'if0_42203229');
+define('DB_PASS', 'mT23zUHcYUU');
+define('DB_NAME', 'if0_42203229_umutako_art_store');
 
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
