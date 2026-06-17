@@ -24,7 +24,13 @@ $row = $stmt->get_result()->fetch_assoc();
 
 if ($row) {
     $host = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
-    $row['image'] = !empty($row['image']) ? $host . '/' . ltrim($row['image'], '/') : null;
+    if (!empty($row['image'])) {
+        $row['image'] = strpos($row['image'], 'http') === 0
+            ? $row['image']
+            : $host . '/' . ltrim($row['image'], '/');
+    } else {
+        $row['image'] = null;
+    }
 }
 
 echo json_encode($row ?: ['error' => 'Product not found.']);

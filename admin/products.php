@@ -26,8 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stock = (int)($_POST['stock']        ?? 0);
     $catid = (int)($_POST['category_id']  ?? 0);
 
-    // Handle image upload
+    // Handle image — uploaded file takes priority, then pasted URL, then existing
     $imagePath = trim($_POST['existing_image'] ?? '');
+    $imageUrl  = trim($_POST['image_url']      ?? '');
 
     if (!empty($_FILES['image']['name'])) {
         $allowed   = ['jpg','jpeg','png','gif','webp'];
@@ -36,14 +37,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $filename  = 'product_' . time() . '_' . mt_rand(100,999) . '.' . $ext;
             $uploadDir = '../images/products/';
             if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $filename)) {
-                // Delete old image if editing
-                if (!empty($imagePath)) {
-                    $old = $uploadDir . basename($imagePath);
+                if (!empty($imagePath) && strpos($imagePath, 'images/products/') !== false) {
+                    $old = '../' . $imagePath;
                     if (file_exists($old)) unlink($old);
                 }
                 $imagePath = 'images/products/' . $filename;
             }
         }
+    } elseif (!empty($imageUrl)) {
+        // Use external URL directly
+        $imagePath = $imageUrl;
     }
 
     if ($id > 0) {
@@ -120,34 +123,60 @@ $baseUrl  = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HT
             <textarea name="description" rows="3"><?= htmlspecialchars($editing['description'] ?? '') ?></textarea>
         </div>
 
-        <!-- IMAGE UPLOAD -->
+        <!-- IMAGE UPLOAD + URL -->
         <div class="form-group">
             <label>Product Image</label>
             <div class="img-upload-wrap">
                 <!-- Preview -->
                 <div class="img-preview" id="img-preview">
                     <?php if (!empty($editing['image'])): ?>
-                        <img src="../<?= htmlspecialchars($editing['image']) ?>" alt="Current image"/>
+                        <img src="<?= strpos($editing['image'], 'http') === 0 ? htmlspecialchars($editing['image']) : '../' . htmlspecialchars($editing['image']) ?>" alt="Current image"/>
                     <?php else: ?>
                         <span class="img-placeholder">📷<br/><small>No image</small></span>
                     <?php endif; ?>
                 </div>
+
                 <div class="img-upload-controls">
+                    <!-- Upload file -->
                     <label class="upload-btn" for="image-input">
-                        📁 Choose Image
+                        📁 Upload Image
                         <input type="file" id="image-input" name="image" accept="image/*" onchange="previewImage(this)"/>
                     </label>
-                    <small style="color:var(--text-400);display:block;margin-top:6px">
+                    <small style="color:var(--text-400);display:block;margin-top:5px;margin-bottom:14px">
                         JPG, PNG, GIF, WEBP — max 5MB
                     </small>
-                    <?php if (!empty($editing['image'])): ?>
-                        <div class="img-url-box">
-                            <label>Image URL</label>
-                            <div class="img-url-row">
-                                <input type="text" readonly value="<?= $baseUrl . htmlspecialchars($editing['image']) ?>" id="img-url-field"/>
-                                <button type="button" class="copy-btn" onclick="copyImgUrl()">📋 Copy</button>
-                            </div>
+
+                    <!-- OR paste URL -->
+                    <div class="img-url-box">
+                        <label>Or Paste Image URL</label>
+                        <div class="img-url-row">
+                            <input type="text"
+                                   id="image_url"
+                                   name="image_url"
+                                   placeholder="https://example.com/image.jpg"
+                                   value="<?= (!empty($editing['image']) && strpos($editing['image'], 'http') === 0) ? htmlspecialchars($editing['image']) : '' ?>"
+                                   oninput="previewUrl(this.value)"/>
+                            <button type="button" class="copy-btn" onclick="clearUrl()">✕ Clear</button>
                         </div>
+                    </div>
+
+                    <!-- Current image URL (read-only, copy) -->
+                    <?php
+                        $fullImgUrl = '';
+                        if (!empty($editing['image'])) {
+                            $fullImgUrl = strpos($editing['image'], 'http') === 0
+                                ? $editing['image']
+                                : $baseUrl . $editing['image'];
+                        }
+                    ?>
+                    <?php if ($fullImgUrl): ?>
+                    <div class="img-url-box" style="margin-top:12px">
+                        <label>Current Image URL</label>
+                        <div class="img-url-row">
+                            <input type="text" readonly value="<?= htmlspecialchars($fullImgUrl) ?>" id="img-url-field" onclick="this.select()"/>
+                            <button type="button" class="copy-btn" onclick="copyImgUrl()">📋 Copy</button>
+                        </div>
+                    </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -216,21 +245,35 @@ $baseUrl  = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HT
 
 <script>
 function previewImage(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('img-preview').innerHTML = `<img src="${e.target.result}" alt="Preview"/>`;
+        document.getElementById('image_url').value = '';
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+function previewUrl(val) {
     const preview = document.getElementById('img-preview');
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            preview.innerHTML = `<img src="${e.target.result}" alt="Preview"/>`;
-        };
-        reader.readAsDataURL(input.files[0]);
+    if (val.trim()) {
+        preview.innerHTML = `<img src="${val}" alt="Preview" onerror="this.parentElement.innerHTML='<span class=\'img-placeholder\'>❌<br/><small>Invalid URL</small></span>'"/>`;
+        document.getElementById('image-input').value = '';
+    } else {
+        preview.innerHTML = `<span class="img-placeholder">📷<br/><small>No image</small></span>`;
     }
+}
+
+function clearUrl() {
+    document.getElementById('image_url').value = '';
+    document.getElementById('img-preview').innerHTML = `<span class="img-placeholder">📷<br/><small>No image</small></span>`;
 }
 
 function copyImgUrl() {
     const field = document.getElementById('img-url-field');
     field.select();
     document.execCommand('copy');
-    const btn = document.querySelector('.copy-btn');
+    const btn = event.target;
     btn.textContent = '✅ Copied!';
     setTimeout(() => btn.textContent = '📋 Copy', 2000);
 }

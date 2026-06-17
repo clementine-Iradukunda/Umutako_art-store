@@ -49,7 +49,13 @@ while ($row = $result->fetch_assoc()) {
 // Build full image URL for each product
 $host = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 foreach ($products as &$p) {
-    $p['image'] = !empty($p['image']) ? $host . '/' . ltrim($p['image'], '/') : null;
+    if (!empty($p['image'])) {
+        $p['image'] = strpos($p['image'], 'http') === 0
+            ? $p['image']
+            : $host . '/' . ltrim($p['image'], '/');
+    } else {
+        $p['image'] = null;
+    }
 }
 unset($p);
 
