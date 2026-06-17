@@ -46,6 +46,13 @@ while ($row = $result->fetch_assoc()) {
     $products[] = $row;
 }
 
+// Build full image URL for each product
+$host = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+foreach ($products as &$p) {
+    $p['image'] = !empty($p['image']) ? $host . '/' . ltrim($p['image'], '/') : null;
+}
+unset($p);
+
 echo json_encode($products);
 $conn->close();
 ?>

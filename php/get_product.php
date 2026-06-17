@@ -22,6 +22,11 @@ $stmt->bind_param('i', $id);
 $stmt->execute();
 $row = $stmt->get_result()->fetch_assoc();
 
+if ($row) {
+    $host = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+    $row['image'] = !empty($row['image']) ? $host . '/' . ltrim($row['image'], '/') : null;
+}
+
 echo json_encode($row ?: ['error' => 'Product not found.']);
 $conn->close();
 ?>

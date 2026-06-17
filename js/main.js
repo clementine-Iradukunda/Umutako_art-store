@@ -95,10 +95,13 @@ function renderCartItems() {
         const icon    = CAT_ICONS[item.category_name] || '🎁';
         const subtotal = Number(item.price) * item.quantity;
         total += subtotal;
+        const thumbHtml = item.image
+            ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm)"/>`
+            : icon;
 
         html += `
         <div class="cart-item">
-            <div class="ci-icon">${icon}</div>
+            <div class="ci-icon">${thumbHtml}</div>
             <div class="ci-info">
                 <div class="ci-name">${item.name}</div>
                 <div class="ci-price">RWF ${Number(item.price).toLocaleString()} each</div>
@@ -298,14 +301,15 @@ function renderProducts(products) {
         const lowStock = Number(p.stock) > 0 && Number(p.stock) <= 5
                          ? `<div class="stock-warning">⚠️  Only ${p.stock} left!</div>` : '';
         const soldOut  = Number(p.stock) === 0;
-
-        // Safely JSON-encode the product for the onclick attribute
-        const pJson = encodeProductForAttr(p);
+        const pJson    = encodeProductForAttr(p);
+        const thumbContent = p.image
+            ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"/>`
+            : icon;
 
         html += `
         <div class="product-card">
             <div class="product-thumb" onclick="window.location='product.html?id=${p.id}'" title="View details" style="cursor:pointer">
-                ${icon}
+                ${thumbContent}
             </div>
             <div class="product-info">
                 <div class="product-cat">${p.category_name || ''}</div>

@@ -30,7 +30,12 @@
 
         document.getElementById('pdp-inner').innerHTML = `
             <div class="pdp-media">
-                <div class="pdp-thumb">${icon}</div>
+                <div class="pdp-thumb">
+                    ${p.image
+                        ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-lg)"/>`
+                        : icon
+                    }
+                </div>
             </div>
             <div class="pdp-info">
                 <div class="product-cat">${p.category_name || ''}</div>
@@ -58,9 +63,12 @@
             const icon    = getIcon(p.category_name);
             const pJson   = encodeProductForAttr(p);
             const soldOut = Number(p.stock) === 0;
+            const thumbContent = p.image
+                ? `<img src="${p.image}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0"/>`
+                : icon;
             html += `
             <div class="product-card">
-                <div class="product-thumb" onclick="window.location='product.html?id=${p.id}'" style="cursor:pointer">${icon}</div>
+                <div class="product-thumb" onclick="window.location='product.html?id=${p.id}'" style="cursor:pointer">${thumbContent}</div>
                 <div class="product-info">
                     <div class="product-cat">${p.category_name || ''}</div>
                     <div class="product-name">${p.name}</div>
